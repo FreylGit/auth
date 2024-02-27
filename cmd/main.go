@@ -2,37 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
-	desc "github.com/FreylGit/auth/pkg/user_v1"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-	"google.golang.org/protobuf/types/known/emptypb"
+	"github.com/FreylGit/auth/internal/app"
 	"log"
-	"net"
 )
 
-const grpcPort = 50051
-
-type server struct {
-	desc.UnimplementedUserV1Server
-}
-
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	ctx := context.Background()
+	a, err := app.NewApp(ctx)
 	if err != nil {
-		log.Fatalf("Failed to listen:%d", grpcPort)
+		log.Fatal("failed settings")
 	}
-
-	s := grpc.NewServer()
-	reflection.Register(s)
-	desc.RegisterUserV1Server(s, &server{})
-
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Failed to server")
+	err = a.Run()
+	if err != nil {
+		panic("Failed run")
 	}
-}
-
-func (s *server) Get(ctx context.Context, req *desc.GetRequest) (*emptypb.Empty, error) {
-	log.Printf("request:%+v", req)
-	return &emptypb.Empty{}, nil
 }
