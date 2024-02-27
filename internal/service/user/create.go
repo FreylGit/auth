@@ -6,7 +6,7 @@ import (
 	password "github.com/vzglad-smerti/password_hash"
 )
 
-func (s serv) Create(ctx context.Context, user *model.User) (int64, error) {
+func (s *serv) Create(ctx context.Context, user *model.User) (int64, error) {
 	var userId int64
 	var role *model.Role
 	passwordHash, err := password.Hash(user.Password)
@@ -25,16 +25,15 @@ func (s serv) Create(ctx context.Context, user *model.User) (int64, error) {
 		if errTx != nil {
 			return errTx
 		}
-		errTx = s.userRepository.AddRole(ctx, userId, role.Id)
-		if errTx != nil {
-			return errTx
-		}
 
 		return nil
 	})
 	if err != nil {
 		return 0, err
 	}
-
+	err = s.userRepository.AddRole(ctx, userId, role.Id)
+	if err != nil {
+		return 0, err
+	}
 	return userId, nil
 }
