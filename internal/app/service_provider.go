@@ -6,6 +6,7 @@ import (
 	"github.com/FreylGit/auth/internal/client/db"
 	"github.com/FreylGit/auth/internal/client/db/pg"
 	"github.com/FreylGit/auth/internal/client/db/transaction"
+	"github.com/FreylGit/auth/internal/closer"
 	"github.com/FreylGit/auth/internal/config"
 	"github.com/FreylGit/auth/internal/repository"
 	"github.com/FreylGit/auth/internal/repository/role"
@@ -73,6 +74,10 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 		if err != nil {
 			log.Fatalf("Failed ping database")
 		}
+		closer.Add(func() error {
+			cl.Close()
+			return nil
+		})
 		s.dbClient = cl
 	}
 
