@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/FreylGit/auth/internal/client/db"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/pkg/errors"
 )
 
 type pgClient struct {
@@ -13,22 +14,21 @@ type pgClient struct {
 func New(ctx context.Context, dsn string) (db.Client, error) {
 	dbc, err := pgxpool.New(ctx, dsn)
 	if err != nil {
-		return nil, err
+		return nil, errors.Errorf("failed to connect to db: %v", err)
 	}
-	pg := NewDB(dbc)
 
 	return &pgClient{
-		masterDBC: pg,
+		masterDBC: &pg{dbc: dbc},
 	}, nil
 }
 
-func (p pgClient) DB() db.DB {
-	return p.masterDBC
+func (c *pgClient) DB() db.DB {
+	return c.masterDBC
 }
 
-func (p pgClient) Close() error {
-	if p.masterDBC != nil {
-		p.masterDBC.Close()
+func (c *pgClient) Close() error {
+	if c.masterDBC != nil {
+		c.masterDBC.Close()
 	}
 
 	return nil

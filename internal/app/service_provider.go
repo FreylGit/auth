@@ -17,9 +17,9 @@ import (
 )
 
 type serviceProvider struct {
-	userImpl       *user.Implementation
 	grpcConfig     config.GRPCConfig
 	pgConfig       config.PGConfig
+	userImpl       *user.Implementation
 	dbClient       db.Client
 	userService    service.UserService
 	userRepository repository.UserRepository
@@ -68,16 +68,15 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
 		cl, err := pg.New(ctx, s.PGConfig().DSN())
 		if err != nil {
-			log.Fatalf("Failed to connect db")
+			log.Fatalf("failed to create db client: %v", err)
 		}
+
 		err = cl.DB().Ping(ctx)
 		if err != nil {
-			log.Fatalf("Failed ping database")
+			log.Fatalf("ping error: %s", err.Error())
 		}
-		closer.Add(func() error {
-			cl.Close()
-			return nil
-		})
+		closer.Add(cl.Close)
+
 		s.dbClient = cl
 	}
 
@@ -86,7 +85,9 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 
 func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
-		s.userService = userService.NewService(s.UserRepository(ctx), s.RoleRepository(ctx), s.TxManager(ctx))
+		s.userService = userService.NewService(s.UserRepository(ctx),
+			s.RoleRepository(ctx),
+			s.TxManager(ctx))
 	}
 
 	return s.userService
