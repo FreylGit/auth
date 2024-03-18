@@ -2,11 +2,11 @@ package role
 
 import (
 	"context"
-	"github.com/FreylGit/auth/internal/client/db"
 	"github.com/FreylGit/auth/internal/model"
 	"github.com/FreylGit/auth/internal/repository"
 	modelRepo "github.com/FreylGit/auth/internal/repository/role/model"
 	"github.com/FreylGit/auth/internal/repository/user/converter"
+	"github.com/FreylGit/platform_common/pkg/db"
 	sq "github.com/Masterminds/squirrel"
 	"strings"
 )

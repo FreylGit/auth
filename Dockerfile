@@ -1,4 +1,4 @@
-FROM golang:1.21.5-alpine AS builder
+FROM golang:1.22-alpine AS builder
 
 COPY . /github.com/FreylGit/auth/sourse/
 WORKDIR /github.com/FreylGit/auth/sourse/

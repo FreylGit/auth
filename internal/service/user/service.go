@@ -1,9 +1,9 @@
 package user
 
 import (
-	"github.com/FreylGit/auth/internal/client/db"
 	"github.com/FreylGit/auth/internal/repository"
 	"github.com/FreylGit/auth/internal/service"
+	"github.com/FreylGit/platform_common/pkg/db"
 )
 
 type serv struct {

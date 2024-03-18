@@ -2,7 +2,8 @@ package user
 
 import (
 	"context"
-	"github.com/FreylGit/auth/internal/client/db"
+	"github.com/FreylGit/platform_common/pkg/db"
+
 	"github.com/FreylGit/auth/internal/model"
 	"github.com/FreylGit/auth/internal/repository"
 	"github.com/FreylGit/auth/internal/repository/user/converter"

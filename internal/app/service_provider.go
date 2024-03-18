@@ -3,16 +3,16 @@ package app
 import (
 	"context"
 	"github.com/FreylGit/auth/internal/api/user"
-	"github.com/FreylGit/auth/internal/client/db"
-	"github.com/FreylGit/auth/internal/client/db/pg"
-	"github.com/FreylGit/auth/internal/client/db/transaction"
-	"github.com/FreylGit/auth/internal/closer"
 	"github.com/FreylGit/auth/internal/config"
 	"github.com/FreylGit/auth/internal/repository"
 	"github.com/FreylGit/auth/internal/repository/role"
 	userRepository "github.com/FreylGit/auth/internal/repository/user"
 	"github.com/FreylGit/auth/internal/service"
 	userService "github.com/FreylGit/auth/internal/service/user"
+	"github.com/FreylGit/platform_common/pkg/closer"
+	"github.com/FreylGit/platform_common/pkg/db"
+	"github.com/FreylGit/platform_common/pkg/db/pg"
+	"github.com/FreylGit/platform_common/pkg/db/transaction"
 	"log"
 )
 

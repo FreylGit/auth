@@ -2,9 +2,9 @@ package app
 
 import (
 	"context"
-	"github.com/FreylGit/auth/internal/closer"
 	"github.com/FreylGit/auth/internal/config"
 	desc "github.com/FreylGit/auth/pkg/user_v1"
+	"github.com/FreylGit/platform_common/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
