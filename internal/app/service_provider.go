@@ -2,12 +2,15 @@ package app
 
 import (
 	"context"
+	"github.com/FreylGit/auth/internal/api/auth"
 	"github.com/FreylGit/auth/internal/api/user"
 	"github.com/FreylGit/auth/internal/config"
 	"github.com/FreylGit/auth/internal/repository"
+	"github.com/FreylGit/auth/internal/repository/refreshToken"
 	"github.com/FreylGit/auth/internal/repository/role"
 	userRepository "github.com/FreylGit/auth/internal/repository/user"
 	"github.com/FreylGit/auth/internal/service"
+	auth2 "github.com/FreylGit/auth/internal/service/auth"
 	userService "github.com/FreylGit/auth/internal/service/user"
 	"github.com/FreylGit/platform_common/pkg/closer"
 	"github.com/FreylGit/platform_common/pkg/db"
@@ -17,13 +20,16 @@ import (
 )
 
 type serviceProvider struct {
-	grpcConfig     config.GRPCConfig
-	pgConfig       config.PGConfig
-	userImpl       *user.Implementation
-	dbClient       db.Client
-	userService    service.UserService
-	userRepository repository.UserRepository
-	roleRepository repository.RoleRepository
+	grpcConfig             config.GRPCConfig
+	pgConfig               config.PGConfig
+	userImpl               *user.Implementation
+	authImpl               *auth.Implementation
+	dbClient               db.Client
+	userService            service.UserService
+	authService            service.AuthService
+	userRepository         repository.UserRepository
+	roleRepository         repository.RoleRepository
+	refreshTokenRepository repository.RefreshTokenRepository
 
 	txManager db.TxManager
 }
@@ -38,6 +44,14 @@ func (s *serviceProvider) UserImpl(ctx context.Context) *user.Implementation {
 	}
 
 	return s.userImpl
+}
+
+func (s *serviceProvider) AuthImpl(ctx context.Context) *auth.Implementation {
+	if s.authImpl == nil {
+		s.authImpl = auth.NewImplementation(s.AuthService(ctx))
+	}
+
+	return s.authImpl
 }
 
 func (s *serviceProvider) GRPCConfig() config.GRPCConfig {
@@ -83,6 +97,14 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	return s.dbClient
 }
 
+func (s *serviceProvider) AuthService(ctx context.Context) service.AuthService {
+	if s.authService == nil {
+		s.authService = auth2.NewService(s.TxManager(ctx), s.UserRepository(ctx), s.RefreshTokenRepository(ctx))
+	}
+
+	return s.authService
+}
+
 func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
 		s.userService = userService.NewService(s.UserRepository(ctx),
@@ -99,6 +121,14 @@ func (s *serviceProvider) UserRepository(ctx context.Context) repository.UserRep
 	}
 
 	return s.userRepository
+}
+
+func (s *serviceProvider) RefreshTokenRepository(ctx context.Context) repository.RefreshTokenRepository {
+	if s.refreshTokenRepository == nil {
+		s.refreshTokenRepository = refreshToken.NewRepository(s.DBClient(ctx))
+	}
+
+	return s.refreshTokenRepository
 }
 
 func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {

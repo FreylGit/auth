@@ -58,8 +58,30 @@ func (r *repo) Get(ctx context.Context, id int64) (*model.User, error) {
 	return converter.ToUserFromRepo(user), nil
 }
 
-func (r *repo) Create(ctx context.Context, user *model.User) (int64, error) {
+func (r *repo) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	builder := sq.Select(idColumn, nameColumn, emailColumn, passwordHashColumn).
+		PlaceholderFormat(sq.Dollar).
+		From(tableNameUser).
+		Where(sq.Eq{emailColumn: email}).
+		Limit(1)
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+	q := db.Query{
+		Name:     "user_repository.GetByEmail",
+		QueryRaw: query,
+	}
+	var user modelRepo.User
+	err = r.db.DB().ScanOneContext(ctx, &user, q, args...)
+	if err != nil {
+		return nil, err
+	}
 
+	return converter.ToUserFromRepo(user), nil
+}
+
+func (r *repo) Create(ctx context.Context, user *model.User) (int64, error) {
 	builder := sq.Insert(tableNameUser).
 		PlaceholderFormat(sq.Dollar).
 		Columns(nameColumn, emailColumn, passwordHashColumn).

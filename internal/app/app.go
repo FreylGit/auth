@@ -3,7 +3,8 @@ package app
 import (
 	"context"
 	"github.com/FreylGit/auth/internal/config"
-	desc "github.com/FreylGit/auth/pkg/user_v1"
+	descAuth "github.com/FreylGit/auth/pkg/auth_v1"
+	descUser "github.com/FreylGit/auth/pkg/user_v1"
 	"github.com/FreylGit/platform_common/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -69,7 +70,8 @@ func (a *App) initServiceProvider(ctx context.Context) error {
 func (a *App) initGRPCServer(ctx context.Context) error {
 	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
 	reflection.Register(a.grpcServer)
-	desc.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
+	descAuth.RegisterAuthV1Server(a.grpcServer, a.serviceProvider.AuthImpl(ctx))
+	descUser.RegisterUserV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
 
 	return nil
 }

@@ -13,6 +13,7 @@ func ToUserFromRepo(user modelRepo.User) *model.User {
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+		Password:  string(user.PasswordHash),
 	}
 }
 

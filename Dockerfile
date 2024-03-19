@@ -10,5 +10,7 @@ FROM alpine:latest
 
 WORKDIR /root/
 COPY --from=builder /github.com/FreylGit/auth/sourse/bin/auth_server .
+COPY .env .
+
 
 CMD ["./auth_server"]
